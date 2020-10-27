@@ -17,7 +17,7 @@ h1, h2 {
     text-align:center;
 }
 
-h3, h4, h5, input, li, p, label {
+h3, h4, h5, input, li, p, label, pre {
     font-family: 'Roboto', sans-serif;
 }
 
@@ -147,3 +147,8 @@ input:valid + span:after {
 .birthdayTextEnding {
     font-family: 'Sansita Swashed', cursive;
 }
+
+.error-message{
+    text-align:center;
+}
+

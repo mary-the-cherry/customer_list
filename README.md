@@ -5,6 +5,7 @@
 Api to learn react functionalities:
 - UseReduce Hook
 - UseContext Hook
+- UseRef Hook
 - use react-error-boundary npm package
 
 ## The API
@@ -21,6 +22,8 @@ The border of each customer is depending on the gender(implemented with a useCon
 - blue: male
 - pink: female
 - yellow: other
+
+Adapted for keybord users(implemendet with the UseRef Hook)
 
 ## Component Overview
 

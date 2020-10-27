@@ -1,17 +1,21 @@
-import React, {createContext } from 'react';
-export const PageContext = createContext();
-const PageContextProvider = (props) => {
+import React, { createContext } from 'react';
+
+//create the Context
+export const ColorContext = createContext();
+
+//add data to the Provider and set the ContextProvider for other components
+const ColorContextProvider = (props) => {
     const colors = {
         female: 'pink',
         male: 'blue',
         other: 'yellow'
     };
     return (
-        <PageContext.Provider value={{
+        <ColorContext.Provider value={{
             colors: colors,
         }}>
             {props.children}
-        </PageContext.Provider>
+        </ColorContext.Provider>
     );
 }
-export default PageContextProvider;
+export default ColorContextProvider;

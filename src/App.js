@@ -1,21 +1,22 @@
 import React, {useReducer} from 'react';
 import CustomerCard from './components/CustomerCard';
 import NewCustomer from './components/NewCustomer';
-import PageContextProvider from './components/GenderContext';
+import ColorContextProvider from './components/GenderContext';
 import { nanoid } from 'nanoid';
-import ErrorBoundary from './components/ErrorBoundary';
+import { ErrorBoundary } from 'react-error-boundary'
 
+
+//Defaultlist of customers
 const CUST_LIST = [
-    { firstname: "Maren", lastname: "Meyer", gender: "female", age: "30" , id:"1"},
-    { firstname: "Svenja", lastname: "Meyer", gender: "female", age: "33", id:"2"},
-    { firstname: "Guido", lastname: "De Marco", gender: "male", age: "34", id: "3" },
-    { firstname: "Maren", lastname: "Meyer", gender: "female", age: "30", id: "4" },
-    { firstname: "Svenja", lastname: "Meyer", gender: "female", age: "33", id: "5" },
-    { firstname: "Guido", lastname: "De Marco", gender: "male", age: "34", id: "6" },
-    { firstname: "Guido", lastname: "De Marco", gender: "male", age: "34", id: "7" }
+    { firstname: "Harry", lastname: "Potter", gender: "male", age: "30" , id:"1"},
+    { firstname: "Mary", lastname: "Poppins", gender: "female", age: "45", id:"2"},
+    { firstname: "Hermione", lastname: "Granger", gender: "female", age: "30", id: "3" }
 ];
 
 function chunk(arr, len) {
+    /*
+     * Chunk any array in smaller array: arr --> Array, len: length of subarray 
+     */
     var chunks = [],
         i = 0,
         n = arr.length;
@@ -26,11 +27,14 @@ function chunk(arr, len) {
 }
 
 function ErrorFallback({ error, resetErrorBoundary }) {
+    /*
+     * Fallback for all errors whch occur while rendering
+     */
     return (
-        <div role="alert">
-            <p>Something went wrong:</p>
+        <div className="error-message" role="alert">
+            <h2>Something went wrong:</h2>
             <pre>{error.message}</pre>
-            <button onClick={resetErrorBoundary}>Try again</button>
+            <button className="btn btn-outline-dark btn-sm" onClick={resetErrorBoundary}>Try again</button>
         </div>
     )
 }
@@ -38,9 +42,12 @@ function ErrorFallback({ error, resetErrorBoundary }) {
 
 function App() {
 
-    const [customer, dispatch] = useReducer(actionsCustomerList, CUST_LIST);
+    const [customer, dispatch] = useReducer(actionsCustomerList, CUST_LIST);        //global customerlist
     
-    const customerList = chunk(customer, 3).map((chunk,index) => {
+    const customerList = chunk(customer, 3).map((chunk, index) => {
+        /*
+         * function to create a card for each customer
+         */
         return (
             <div className="card-deck" key={index}>
                 {chunk.map(person => (
@@ -59,7 +66,9 @@ function App() {
     });
 
     function actionsCustomerList(customer, action) {
-
+        /*
+         * possible actions to the customerlist
+         */
         switch (action.type) {
             case 'addCustomer':
                 const newCustomer = {
@@ -92,8 +101,13 @@ function App() {
     }
 
     return (
-        <ErrorBoundary>
-        <PageContextProvider>
+        <ErrorBoundary
+            FallbackComponent={ErrorFallback}
+            onReset={() => {
+                
+            }}
+        >
+        <ColorContextProvider>
             <div className="App container">
                 <header >
                     <h1 className="title-api">Customer List</h1>
@@ -107,7 +121,7 @@ function App() {
                 </div>
                 </div>
                 
-            </PageContextProvider>
+            </ColorContextProvider>
         </ErrorBoundary>
   );
 }

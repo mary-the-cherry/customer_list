@@ -1,25 +1,70 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useRef, useEffect } from "react";
 import { useAlert } from 'react-alert';
-import { PageContext } from './GenderContext';
-import ErrorBoundary from './ErrorBoundary';
+import { ColorContext } from './GenderContext';
 
-
+function usePrevious(value) {
+/*
+ * function to get the previous value of a state
+ */
+    const ref = useRef();
+    useEffect(() => {
+        ref.current = value;
+    });
+    return ref.current;
+}
 
 export default function CustomerCard(props) {
 
-    const [edit, setEdit] = useState(false);
-    const [firstname, setFirstname] = useState(props.firstname);
-    const [lastname, setLastname] = useState(props.lastname);
-    const [age, setAge] = useState(props.age);
-    const [birthdayCard, setBirthdayCard] = useState(false);
-    const alert = useAlert();
-    const { colors } = useContext(PageContext);
+    const [edit, setEdit] = useState(false);                            //state to save value which view will be shown
+    const [firstname, setFirstname] = useState(props.firstname);        //state of the controlled input component firstname
+    const [lastname, setLastname] = useState(props.lastname);           //state of the controlled input component lastname
+    const [age, setAge] = useState(props.age);                          //state of the controlled input component age
+    const [birthdayCard, setBirthdayCard] = useState(false);            //state to save value if a birthdayCard or just a send birthdaycard button is shown
+    const alert = useAlert();                                           //use alert lib to show an alert
+    const { colors } = useContext(ColorContext);                        //get the colors out of the Context ColorGender
+    const editFieldRef = useRef(null);                                  //useRef to improve keyboard accessibility 
+    const editButtonRef = useRef(null);                                 //useRef to improve keyboard accessibility 
+    const sendBCardBtnRef = useRef(null);                               //useRef to improve keyboard accessibility 
+    const closeBCardBtnRef = useRef(null);                              //useRef to improve keyboard accessibility 
+    const wasEditing = usePrevious(edit);                               //Previous value of edit
+    const wasSendingBCard = usePrevious(birthdayCard);                  ////Previous value of birthdayCard
 
     const borderColor = {
+        /*
+         *define depending on the gender which border color for the card is used
+         */
         borderColor: props.gender === 'female' ? colors.female : props.gender === 'male' ? colors.male : colors.other
     };
 
+    useEffect(() => {
+        /*
+         *for keyboard accessibility focus is changed between first edit field and the edit button
+         */
+        if (!wasEditing && edit) {
+            editFieldRef.current.focus();
+        }
+        if (wasEditing && !edit) {
+            editButtonRef.current.focus();
+        }
+    }, [wasEditing, edit]);
+
+    useEffect(() => {
+        /*
+         *for keyboard accessibility focus is changed between close button of the bithday card the send birthday card button
+         */
+        if (!wasSendingBCard && birthdayCard){
+            closeBCardBtnRef.current.focus();
+        }
+        if (wasSendingBCard && !birthdayCard) {
+            sendBCardBtnRef.current.focus();
+        }
+    }, [birthdayCard, wasSendingBCard]);
+
     function handleSaveBtn() {
+    /*
+     * if an input field is empty, the form will not be submitted and an alert will be shown 
+     * if all inputs are correct the changes of the customer via a reducer are suubmitted
+     */
         if (firstname !== "" && lastname !== "" && age !== "") {
             props.dispatch({ type: 'editCustomer', firstname: firstname, lastname: lastname, age: age, id: props.id });
             setEdit(false);
@@ -49,19 +94,21 @@ export default function CustomerCard(props) {
         }
     }
 
-    function throwError() {
-        throw new Error('Ich bin ein Fehler zum abfangen');
-    }
-
     function handleEditBtn() {
-
+        /*
+         * sets the edit to true so the the edit function of the customer will be rendered
+         */
         setEdit(true);
     }
 
     function handleDeleteBtn() {
+        /*
+         * calls the Reducer to delete this Customer
+         */
         props.dispatch({ type:'deleteCustomer', id:props.id})
     }
 
+    // functions to handle the controlled input
     function handleFirstnameChange(e) {
         setFirstname(e.target.value);
     }
@@ -75,14 +122,21 @@ export default function CustomerCard(props) {
     }
 
     function handleBirthdayBtn() {
+        /*
+         * State BirthdayCard is set true and so a Birthday Card is rendered and the age of the customer is increased 
+         */
         setBirthdayCard(true);
         props.dispatch({ type: 'sendBirthdayCard', id: props.id });
     }
 
     function handleCloseBtn() {
+        /*
+         * State BirthdayCard is set false, so just the send birthday card button is displayed
+         */
         setBirthdayCard(false);
     }
 
+    //function to render the edit customer form
     const editCustomer = (
         <div className="card edit-customer">
                   <div className="card-body">
@@ -96,6 +150,7 @@ export default function CustomerCard(props) {
                             name="firstname"
                             value={firstname}
                             onChange={handleFirstnameChange}
+                            ref={editFieldRef}
                               ></input>
                           </div>
                       </div>
@@ -147,17 +202,18 @@ export default function CustomerCard(props) {
               </div>
     );
 
+    //function to render the customer card
     const showCustomer = (
         <div className="card" style={borderColor}>
                 <div className="card-body">
                 <h2 className="card-title">{props.firstname} {props.lastname}</h2>
-             
-                {props.age === '36' ? throwError() : <p className="card-text">Age: {props.age}</p>}
+                 <p className="card-text">Age: {props.age}</p>
                     <div>
                         <button
-                            className="btn btn-outline-dark btn-lg"
-                            type="button"
-                            onClick={handleBirthdayBtn}
+                        className="btn btn-outline-dark btn-lg"
+                        type="button"
+                        onClick={handleBirthdayBtn}
+                        ref={sendBCardBtnRef}
                         >
                             Send Birthday Card<span className="visually-hidden"> to Maren Meyer</span>
                         </button>
@@ -167,6 +223,7 @@ export default function CustomerCard(props) {
                             type="button"
                             className="btn btn-light btn-sm"
                             onClick={handleEditBtn}
+                            ref={editButtonRef}
                         >
                             Edit <span className="visually-hidden">{props.firstname} {props.lastname}</span>
                         </button>
@@ -187,8 +244,9 @@ export default function CustomerCard(props) {
                             <p className="birthdaywish">The secret to staying young is lying about your age.</p>
                             <p className="birthdayTextEnding">Best wishes!</p>
                             <button
-                                className="btn btn-outline-light btn-sm"
-                                onClick={handleCloseBtn}
+                            className="btn btn-outline-light btn-sm"
+                            onClick={handleCloseBtn}
+                            ref={closeBCardBtnRef}
                             >
                                 Close
                         </button>
@@ -200,5 +258,6 @@ export default function CustomerCard(props) {
             
         );
 
+    //depending on the state edit a customer is shown or a editable customer form
     return edit ? editCustomer : showCustomer;
 }
