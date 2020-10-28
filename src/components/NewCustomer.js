@@ -167,7 +167,7 @@ export default function NewCustomer(props) {
             >
               Gender
             </label>
-            <div className="col-sm-9 input-check">
+            <div className="col-sm-9">
               <select
                 name="gender"
                 id="gender-selection"

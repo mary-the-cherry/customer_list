@@ -31,3 +31,6 @@ Adapted for keybord users(implemendet with the UseRef Hook)
 - NewCustomer: Creates the form to add a new Customer
 - GenderContext: Provides the colors for the borderlines
  
+## Online Version
+
+https://gracious-almeida-3f694d.netlify.app

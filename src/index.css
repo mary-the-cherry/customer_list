@@ -77,14 +77,27 @@ label {
   margin: 2vw;
 }
 
-.input-check {
-  width: 100%;
-  display: inline-flex;
+.input-gender{
+    margin-left:0;
 }
 
-.input-check input {
-  width: 100%;
-}
+    .input-gender select{
+        margin-left:-19px;
+        padding:0;
+    }
+
+    .input-check {
+        width: 100%;
+        display: inline-flex;
+        margin: 0;
+        padding: 0;
+    }
+
+    .input-check input{
+        width: 100%;
+        margin: 0;
+        padding: 0;
+    }
 
 input:invalid + span:after {
   content: "✗";
